@@ -1,0 +1,24 @@
+.div-selected {
+  width: 1000px;
+  height: 1000px;
+  border: 1px solid black;
+}
+
+.App-header {
+  background-color: white;
+  height: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.NewDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
