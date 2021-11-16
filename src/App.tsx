@@ -5,7 +5,7 @@ import './App.css';
 function App() {
   return (
     <div className="App">
-      <NewDiv />
+      <NewDiv beginX={0} beginY={0} endX={0} endY={0}/>
     </div>
   );
 }
