@@ -1,16 +1,6 @@
 import React from "react";
 import "../components/NewDiv.css";
 
-interface MyState {
-  beginX: number;
-  beginY: number;
-  endX: number;
-  endY: number;
-  isClicked: boolean;
-  width: number;
-  height: number;
-}
-
 interface MyProps {
   beginX: number;
   beginY: number;
@@ -21,30 +11,48 @@ interface MyProps {
   height: number;
 }
 
+interface MyState {
+  beginX?: number;
+  beginY?: number;
+  endX?: number;
+  endY?: number;
+  isClicked?: boolean;
+  width?: number;
+  height?: number;
+}
+
 class NewDiv extends React.Component<MyProps, MyState> {
-  constructor(props: any) {
+  constructor(props: MyProps) {
     super(props);
+    this.state = { isClicked: false };
   }
 
   mouseDown(e: any) {
-    this.setState({ beginX: e.pageX });
-    this.setState({ beginY: e.pageY });
-    document.addEventListener("mousemove", this.handleMouseMove.bind(this));
+    this.setState({
+      beginX: e.pageX,
+      beginY: e.pageY,
+      width: 0,
+      height: 0,
+      isClicked: !this.state.isClicked,
+    });
+    this.setIsClicked.bind(this);
   }
 
   handleMouseMove(e: any) {
-    this.setState({ endX: e.pageX });
-    this.setState({ endY: e.pageY });
-    this.setState({ width: this.state.endX - this.state.beginX });
-    this.setState({ height: this.state.endY - this.state.beginY });
+    this.setState({
+      endX: e.pageX,
+      endY: e.pageY,
+      width: e.pageX - (this.state as any).beginX,
+      height: e.pageY - (this.state as any).beginY,
+    });
   }
 
-  mouseUp() {
-    document.removeEventListener("mousemove", this.handleMouseMove.bind(this));
+  mouseUp(e: any) {
+    window.onmousemove = null;
   }
 
-  isClicked() {
-    this.setState({ isClicked: !this.isClicked });
+  setIsClicked() {
+    this.setState({ isClicked: !this.state.isClicked });
   }
 
   render() {
@@ -53,23 +61,28 @@ class NewDiv extends React.Component<MyProps, MyState> {
         <header className="App-header">
           <p>Div для рисования divов</p>
         </header>
-        {this.state.isClicked ? (
-          <div
-            className="div-selected"
-            style={{
-              top: this.state.beginY,
-              left: this.state.beginX,
-              width: this.state.width,
-              height: this.state.height,
-              position: "absolute",
-              border: "1px solid black",
-            }}
-            onMouseDown={this.mouseDown.bind(this)}
-            onMouseUp={this.mouseUp.bind(this)}
-          ></div>
-        ) : (
-          ""
-        )}
+        <div
+          className="field"
+          onMouseDown={this.mouseDown.bind(this)}
+          onMouseUp={this.mouseUp.bind(this)}
+          onMouseMove={this.handleMouseMove.bind(this)}
+        >
+          {this.state.isClicked ? (
+            <div
+              className="div-selected"
+              style={{
+                top: this.state.beginY,
+                left: this.state.beginX,
+                width: this.state.width,
+                height: this.state.height,
+                position: "absolute",
+                border: "1px solid black",
+              }}
+            ></div>
+          ) : (
+            ""
+          )}
+        </div>
       </div>
     );
   }
