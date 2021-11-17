@@ -1,16 +1,6 @@
 import React from "react";
 import "../components/NewDiv.css";
 
-interface MyProps {
-  beginX: number;
-  beginY: number;
-  endX: number;
-  endY: number;
-  isClicked: boolean;
-  width: number;
-  height: number;
-}
-
 interface MyState {
   beginX?: number;
   beginY?: number;
@@ -21,10 +11,10 @@ interface MyState {
   height?: number;
 }
 
-class NewDiv extends React.Component<MyProps, MyState> {
-  constructor(props: MyProps) {
+class NewDiv extends React.Component<MyState> {
+  constructor(props: any) {
     super(props);
-    this.state = { isClicked: false };
+    this.state = { isClicked: false};
   }
 
   mouseDown(e: any) {
@@ -33,9 +23,8 @@ class NewDiv extends React.Component<MyProps, MyState> {
       beginY: e.pageY,
       width: 0,
       height: 0,
-      isClicked: !this.state.isClicked,
+      isClicked: !(this.state as any).isClicked
     });
-    this.setIsClicked.bind(this);
   }
 
   handleMouseMove(e: any) {
@@ -45,14 +34,16 @@ class NewDiv extends React.Component<MyProps, MyState> {
       width: e.pageX - (this.state as any).beginX,
       height: e.pageY - (this.state as any).beginY,
     });
+    console.log("444")
   }
 
   mouseUp(e: any) {
-    window.onmousemove = null;
+    this.setIsClicked.bind(this);
+    console.log((this.state as any).isClicked);
   }
 
   setIsClicked() {
-    this.setState({ isClicked: !this.state.isClicked });
+    this.setState({ isClicked: !(this.state as any).isClicked });
   }
 
   render() {
@@ -65,16 +56,20 @@ class NewDiv extends React.Component<MyProps, MyState> {
           className="field"
           onMouseDown={this.mouseDown.bind(this)}
           onMouseUp={this.mouseUp.bind(this)}
-          onMouseMove={this.handleMouseMove.bind(this)}
+          //onMouseMove={this.handleMouseMove.bind(this)}
+          onMouseMove={(this.state as any).isClicked ? () => {
+            console.log("3333")
+            this.handleMouseMove.bind(this);
+          } : undefined}
         >
-          {this.state.isClicked ? (
+          {(this.state as any).isClicked ? (
             <div
               className="div-selected"
               style={{
-                top: this.state.beginY,
-                left: this.state.beginX,
-                width: this.state.width,
-                height: this.state.height,
+                top: (this.state as any).beginY,
+                left: (this.state as any).beginX,
+                width: (this.state as any).width,
+                height: (this.state as any).height,
                 position: "absolute",
                 border: "1px solid black",
               }}
