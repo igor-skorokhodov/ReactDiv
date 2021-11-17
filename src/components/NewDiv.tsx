@@ -38,12 +38,17 @@ class NewDiv extends React.Component<MyState> {
   }
 
   mouseUp(e: any) {
-    this.setIsClicked.bind(this);
+    this.setIsClicked();
     console.log((this.state as any).isClicked);
   }
 
   setIsClicked() {
     this.setState({ isClicked: !(this.state as any).isClicked });
+  }
+
+  setIsClickedFalse() {
+    this.setState({ isClicked: false });
+    console.log((this.state as any).isClicked);
   }
 
   render() {
@@ -56,10 +61,10 @@ class NewDiv extends React.Component<MyState> {
           className="field"
           onMouseDown={this.mouseDown.bind(this)}
           onMouseUp={this.mouseUp.bind(this)}
-          //onMouseMove={this.handleMouseMove.bind(this)}
-          onMouseMove={(this.state as any).isClicked ? () => {
+          onMouseOut={this.setIsClickedFalse.bind(this)}
+          onMouseMove={(this.state as any).isClicked ? (e: any) => {
             console.log("3333")
-            this.handleMouseMove.bind(this);
+            this.handleMouseMove(e);
           } : undefined}
         >
           {(this.state as any).isClicked ? (
