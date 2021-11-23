@@ -9,14 +9,7 @@ function App() {
     <DndProvider backend={HTML5Backend}>
     <div className="App">
       <NewDiv
-        beginX={0}
-        beginY={0}
-        endX={0}
-        endY={0}
-        isClicked={false}
-        width={0}
-        height={0}
-      />
+      array={[{beginX: 0, beginY: 0, endX: 0, endY: 0, width: 0, height: 0}]} isClicked={false}/>
     </div>
     </DndProvider>
   );

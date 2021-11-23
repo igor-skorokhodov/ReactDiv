@@ -24,10 +24,11 @@ class NewDiv extends React.Component<IMyState> {
       isClicked: false,
       isSet: false,
       isMouseDown: false,
-      array: [{ beginX: 0, beginY: 0, endX: 0, endY: 0, width: 0, height: 0 }],
+      array: [],
       ItemTypes: {
         KNIGHT: "knight",
-      }
+      },
+      i: 0,
     };
   }
 
@@ -36,37 +37,35 @@ class NewDiv extends React.Component<IMyState> {
       isClicked: true,
       isSet: true,
       isMouseDown: true,
-      array: (this.state as any).array.push({
-        beginX: e.pageX,
-        beginY: e.pageY,
-        width: 0,
-        height: 0,
-      }),
+      array: [...(this.state as any).array,
+        {
+          beginX: e.pageX,
+          beginY: e.pageY,
+          width: 0,
+          height: 0,
+        },
+      ],
     });
-    console.log((this.state as any));
+    console.log((this.state as any).array)
   }
 
   handleMouseMove(e: any) {
     if (
-      e.pageX - (this.state as any).aaray.beginX < 0 ||
-      e.pageY - (this.state as any).array.beginY < 0
+      e.pageX - (this.state as any).beginX < 0 ||
+      e.pageY - (this.state as any).beginY < 0
     ) {
       this.setState({
-        array: {
-          endX: e.pageX,
-          endY: e.pageY,
-          width: Math.abs(e.pageX - (this.state as any).beginX),
-          height: Math.abs(e.pageY - (this.state as any).beginY),
-        },
+        endX: e.pageX,
+        endY: e.pageY,
+        width: Math.abs(e.pageX - (this.state as any).beginX),
+        height: Math.abs(e.pageY - (this.state as any).beginY),
       });
     } else {
       this.setState({
-        array: {
-          endX: e.pageX,
-          endY: e.pageY,
-          width: e.pageX - (this.state as any).beginX,
-          height: e.pageY - (this.state as any).beginY,
-        },
+        endX: e.pageX,
+        endY: e.pageY,
+        width: e.pageX - (this.state as any).beginX,
+        height: e.pageY - (this.state as any).beginY,
       });
     }
   }
@@ -84,28 +83,23 @@ class NewDiv extends React.Component<IMyState> {
     this.setIsClickedFalse();
     this.setState({ isMouseDown: false });
     if (
-      (this.state as any).array.e.pageX - (this.state as any).array.beginX <
-        0 ||
-      (this.state as any).array.e.pageY - (this.state as any).array.beginY < 0
+      e.pageX - (this.state as any).beginX < 0 ||
+      e.pageY - (this.state as any).beginY < 0
     ) {
       this.setState({
-        array: {
-          endX: e.pageX,
-          endY: e.pageY,
-          width: Math.abs(e.pageX - (this.state as any).beginX),
-          height: Math.abs(e.pageY - (this.state as any).beginY),
-        },
+        endX: e.pageX,
+        endY: e.pageY,
+        width: Math.abs(e.pageX - (this.state as any).beginX),
+        height: Math.abs(e.pageY - (this.state as any).beginY),
         isMouseDown: false,
       });
     } else {
       this.setState({
-        array: {
-          endX: e.pageX,
-          endY: e.pageY,
-          width: e.pageX - (this.state as any).array.beginX,
-          height: e.pageY - (this.state as any).array.beginY,
-          isMouseDown: false,
-        },
+        endX: e.pageX,
+        endY: e.pageY,
+        width: e.pageX - (this.state as any).beginX,
+        height: e.pageY - (this.state as any).beginY,
+        isMouseDown: false,
       });
     }
   }
@@ -119,9 +113,7 @@ class NewDiv extends React.Component<IMyState> {
   }
 
   render() {
-    {console.log((this.state as any).array)}
     return (
-   
       <>
         <Knight />
         <div className="NewDiv">
