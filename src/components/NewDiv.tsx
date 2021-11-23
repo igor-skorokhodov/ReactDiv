@@ -49,15 +49,15 @@ class NewDiv extends React.Component<IMyState> {
 
   handleMouseMove(e: any) {
     if (
-      e.pageX - (this.state as any).aaray.beginX < 0 ||
+      e.pageX - (this.state as any).array.beginX < 0 ||
       e.pageY - (this.state as any).array.beginY < 0
     ) {
       this.setState({
         array: {
           endX: e.pageX,
           endY: e.pageY,
-          width: Math.abs(e.pageX - (this.state as any).beginX),
-          height: Math.abs(e.pageY - (this.state as any).beginY),
+          width: Math.abs(e.pageX - (this.state as any).array.beginX),
+          height: Math.abs(e.pageY - (this.state as any).array.beginY),
         },
       });
     } else {
@@ -65,8 +65,8 @@ class NewDiv extends React.Component<IMyState> {
         array: {
           endX: e.pageX,
           endY: e.pageY,
-          width: e.pageX - (this.state as any).beginX,
-          height: e.pageY - (this.state as any).beginY,
+          width: e.pageX - (this.state as any).array.beginX,
+          height: e.pageY - (this.state as any).array.beginY,
         },
       });
     }
@@ -76,8 +76,8 @@ class NewDiv extends React.Component<IMyState> {
     this.setState({
       endX: e.pageX, //(this.state as any).beginX,
       endY: e.pageY, //(this.state as any).beginY,
-      width: e.pageX - (this.state as any).beginX,
-      height: e.pageY - (this.state as any).beginY,
+      width: e.pageX - (this.state as any).array.beginX,
+      height: e.pageY - (this.state as any).array.beginY,
     });
   }
 
@@ -93,8 +93,8 @@ class NewDiv extends React.Component<IMyState> {
         array: {
           endX: e.pageX,
           endY: e.pageY,
-          width: Math.abs(e.pageX - (this.state as any).beginX),
-          height: Math.abs(e.pageY - (this.state as any).beginY),
+          width: Math.abs(e.pageX - (this.state as any).array.beginX),
+          height: Math.abs(e.pageY - (this.state as any).array.beginY),
         },
         isMouseDown: false,
       });
