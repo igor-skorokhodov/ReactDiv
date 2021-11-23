@@ -36,14 +36,15 @@ class NewDiv extends React.Component<IMyState> {
       isClicked: true,
       isSet: true,
       isMouseDown: true,
-      array: (this.state as any).array.push({
+      array: [ ... (this.state as any).array, 
+      {
         beginX: e.pageX,
         beginY: e.pageY,
         width: 0,
         height: 0,
-      }),
+      }],
     });
-    console.log((this.state as any));
+    console.log((this.state as any).array);
   }
 
   handleMouseMove(e: any) {
@@ -84,9 +85,9 @@ class NewDiv extends React.Component<IMyState> {
     this.setIsClickedFalse();
     this.setState({ isMouseDown: false });
     if (
-      (this.state as any).array.e.pageX - (this.state as any).array.beginX <
+      e.pageX - (this.state as any).array.beginX <
         0 ||
-      (this.state as any).array.e.pageY - (this.state as any).array.beginY < 0
+      e.pageY - (this.state as any).array.beginY < 0
     ) {
       this.setState({
         array: {
