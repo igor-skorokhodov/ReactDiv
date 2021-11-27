@@ -43,20 +43,8 @@ class NewDiv extends React.Component<{}, IMyState> {
         beginY: e.pageY,
         width: 0,
         height: 0,
-      },
-      array: [
-        ...this.state.array,
-        {
-          beginX: e.pageX,
-          beginY: e.pageY,
-          endX: this.state.current?.endX,
-          endY: this.state.current?.endY,
-          width: 0,
-          height: 0,
-        },
-      ],
+      }
     });
-    console.log(this.state.array);
     console.log(this.state.current);
   }
 
@@ -78,7 +66,7 @@ class NewDiv extends React.Component<{}, IMyState> {
       });
     } else {
       this.setState({
-        array: [
+        current:
           {
             beginX: (this.state as any).array.beginX,
             beginY: (this.state as any).array.beginY,
@@ -87,7 +75,6 @@ class NewDiv extends React.Component<{}, IMyState> {
             width: e.pageX - (this.state as any).array.beginX,
             height: e.pageY - (this.state as any).array.beginY,
           },
-        ],
       });
     }
   }
@@ -100,8 +87,8 @@ class NewDiv extends React.Component<{}, IMyState> {
           beginY: this.state.current?.beginY,
           endX: e.pageX, //(this.state as any).beginX,
           endY: e.pageY, //(this.state as any).beginY,
-          width: e.pageX - this.state.current?.beginX,
-          height: e.pageY - this.state.current?.beginY,
+          width: e.pageX - (this.state.current?.beginX as number),
+          height: e.pageY - (this.state.current?.beginY as number),
         },
       ],
     });
@@ -111,8 +98,8 @@ class NewDiv extends React.Component<{}, IMyState> {
     this.setIsClickedFalse();
     this.setState({ isMouseDown: false });
     if (
-      e.pageX - this.state.current?.beginX < 0 ||
-      e.pageY - this.state.current?.beginY < 0
+      e.pageX - (this.state.current?.beginX as number) < 0 ||
+      e.pageY - (this.state.current?.beginY as number) < 0
     ) {
       this.setState({
         array: [
