@@ -1,5 +1,4 @@
 import React from "react";
-import { isConstructorDeclaration } from "typescript";
 import "../components/NewDiv.css";
 import Knight from "./Knight";
 
@@ -13,7 +12,8 @@ interface IDiv {
 }
 
 interface IMyState {
-  array?: IDiv[];
+  array: IDiv[];
+  current?: IDiv;
   isClicked?: boolean;
   isSet?: boolean;
   isMouseDown?: boolean;
@@ -27,6 +27,7 @@ class NewDiv extends React.Component<{}, IMyState> {
       isSet: false,
       isMouseDown: false,
       array: [{ beginX: 0, beginY: 0, endX: 0, endY: 0, width: 0, height: 0 }],
+      current: { beginX: 0, beginY: 0, endX: 0, endY: 0, width: 0, height: 0 },
     };
   }
 
@@ -35,35 +36,45 @@ class NewDiv extends React.Component<{}, IMyState> {
       isClicked: true,
       isSet: true,
       isMouseDown: true,
+      current:    {
+        endX: this.state.current?.endX,
+        endY: this.state.current?.endY,
+        beginX: e.pageX,
+        beginY: e.pageY,
+        width: 0,
+        height: 0,
+      },
       array: [
-        ...(this.state as any).array,
+        ...this.state.array,
         {
           beginX: e.pageX,
           beginY: e.pageY,
+          endX: this.state.current?.endX,
+          endY: this.state.current?.endY,
           width: 0,
           height: 0,
         },
       ],
     });
-    console.log((this.state as any).array);
+    console.log(this.state.array);
+    console.log(this.state.current);
   }
 
   handleMouseMove(e: any) {
     if (
-      e.pageX - (this.state as any).array.beginX < 0 ||
-      e.pageY - (this.state as any).array.beginY < 0
+      e.pageX - (this.state.current?.beginX as number) < 0 ||
+      e.pageY - (this.state.current?.beginY as number) < 0
     ) {
       this.setState({
-        array: [
+        current:
           {
-            beginX: (this.state as any).array.beginX,
-            beginY: (this.state as any).array.beginY,
+            beginX: this.state.current?.beginX,
+            beginY: this.state.current?.beginY,
             endX: e.pageX,
             endY: e.pageY,
-            width: Math.abs(e.pageX - (this.state as any).array.beginX),
-            height: Math.abs(e.pageY - (this.state as any).array.beginY),
+            width: Math.abs(e.pageX - (this.state.current?.beginX as number)),
+            height: Math.abs(e.pageY - (this.state.current?.beginY as number)),
           },
-        ],
       });
     } else {
       this.setState({
@@ -85,12 +96,12 @@ class NewDiv extends React.Component<{}, IMyState> {
     this.setState({
       array: [
         {
-          beginX: (this.state as any).array.beginX,
-          beginY: (this.state as any).array.beginY,
+          beginX: this.state.current?.beginX,
+          beginY: this.state.current?.beginY,
           endX: e.pageX, //(this.state as any).beginX,
           endY: e.pageY, //(this.state as any).beginY,
-          width: e.pageX - (this.state as any).array.beginX,
-          height: e.pageY - (this.state as any).array.beginY,
+          width: e.pageX - this.state.current?.beginX,
+          height: e.pageY - this.state.current?.beginY,
         },
       ],
     });
@@ -100,8 +111,8 @@ class NewDiv extends React.Component<{}, IMyState> {
     this.setIsClickedFalse();
     this.setState({ isMouseDown: false });
     if (
-      e.pageX - (this.state as any).array.beginX < 0 ||
-      e.pageY - (this.state as any).array.beginY < 0
+      e.pageX - this.state.current?.beginX < 0 ||
+      e.pageY - this.state.current?.beginY < 0
     ) {
       this.setState({
         array: [
@@ -142,9 +153,6 @@ class NewDiv extends React.Component<{}, IMyState> {
   }
 
   render() {
-    {
-      console.log((this.state as any).array);
-    }
     return (
       <>
         <Knight />
@@ -164,7 +172,6 @@ class NewDiv extends React.Component<{}, IMyState> {
                 : undefined
             }
           >
-            {console.log((this.state as any).array)}
             {(this.state as any).isSet
               ? (this.state as any).array.map((item: any) => {
                   console.log(item);
