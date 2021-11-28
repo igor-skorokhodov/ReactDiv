@@ -1,5 +1,4 @@
 import React from "react";
-import { isConstructorDeclaration } from "typescript";
 import "../components/NewDiv.css";
 import Knight from "./Knight";
 

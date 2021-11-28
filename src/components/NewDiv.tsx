@@ -32,20 +32,20 @@ class NewDiv extends React.Component<{}, IMyState> {
   }
 
   mouseDown(e: any) {
+    if (e.target.classList.contains("div-selected")) {
+      return;
+    }
     this.setState({
       isClicked: true,
       isSet: true,
       isMouseDown: true,
-      current:    {
-        endX: this.state.current?.endX,
-        endY: this.state.current?.endY,
+      current: {
         beginX: e.pageX,
         beginY: e.pageY,
         width: 0,
         height: 0,
-      }
+      },
     });
-    console.log(this.state.current);
   }
 
   handleMouseMove(e: any) {
@@ -54,43 +54,39 @@ class NewDiv extends React.Component<{}, IMyState> {
       e.pageY - (this.state.current?.beginY as number) < 0
     ) {
       this.setState({
-        current:
-          {
-            beginX: this.state.current?.beginX,
-            beginY: this.state.current?.beginY,
-            endX: e.pageX,
-            endY: e.pageY,
-            width: Math.abs(e.pageX - (this.state.current?.beginX as number)),
-            height: Math.abs(e.pageY - (this.state.current?.beginY as number)),
-          },
+        current: {
+          beginX: this.state.current?.beginX,
+          beginY: this.state.current?.beginY,
+          endX: e.pageX,
+          endY: e.pageY,
+          width: Math.abs(e.pageX - (this.state.current?.beginX as number)),
+          height: Math.abs(e.pageY - (this.state.current?.beginY as number)),
+        },
       });
     } else {
       this.setState({
-        current:
-          {
-            beginX: (this.state as any).array.beginX,
-            beginY: (this.state as any).array.beginY,
-            endX: e.pageX,
-            endY: e.pageY,
-            width: e.pageX - (this.state as any).array.beginX,
-            height: e.pageY - (this.state as any).array.beginY,
-          },
+        current: {
+          beginX: this.state.current?.beginX,
+          beginY: this.state.current?.beginY,
+          endX: e.pageX,
+          endY: e.pageY,
+          width: e.pageX - (this.state.current?.beginX as number),
+          height: e.pageY - (this.state.current?.beginY as number),
+        },
       });
     }
   }
 
   handleMouseMoveDiv(e: any) {
     this.setState({
-      array: [
-        {
-          beginX: this.state.current?.beginX,
-          beginY: this.state.current?.beginY,
-          endX: e.pageX, //(this.state as any).beginX,
-          endY: e.pageY, //(this.state as any).beginY,
-          width: e.pageX - (this.state.current?.beginX as number),
-          height: e.pageY - (this.state.current?.beginY as number),
-        },
-      ],
+      current: {
+        beginX: this.state.current?.beginX,
+        beginY: this.state.current?.beginY,
+        endX: e.pageX, //(this.state as any).beginX,
+        endY: e.pageY, //(this.state as any).beginY,
+        width: e.pageX - (this.state.current?.beginX as number),
+        height: e.pageY - (this.state.current?.beginY as number),
+      },
     });
   }
 
@@ -103,13 +99,14 @@ class NewDiv extends React.Component<{}, IMyState> {
     ) {
       this.setState({
         array: [
+          ...this.state.array,
           {
-            beginX: (this.state as any).array.beginX,
-            beginY: (this.state as any).array.beginY,
+            beginX: (this.state as any).current.beginX,
+            beginY: (this.state as any).current.beginY,
             endX: e.pageX,
             endY: e.pageY,
-            width: Math.abs(e.pageX - (this.state as any).array.beginX),
-            height: Math.abs(e.pageY - (this.state as any).array.beginY),
+            width: Math.abs(e.pageX - (this.state as any).current.beginX),
+            height: Math.abs(e.pageY - (this.state as any).current.beginY),
           },
         ],
         isMouseDown: false,
@@ -117,13 +114,14 @@ class NewDiv extends React.Component<{}, IMyState> {
     } else {
       this.setState({
         array: [
+          ...this.state.array,
           {
-            beginX: (this.state as any).array.beginX,
-            beginY: (this.state as any).array.beginY,
+            beginX: (this.state as any).current.beginX,
+            beginY: (this.state as any).current.beginY,
             endX: e.pageX,
             endY: e.pageY,
-            width: e.pageX - (this.state as any).array.beginX,
-            height: e.pageY - (this.state as any).array.beginY,
+            width: e.pageX - (this.state as any).current.beginX,
+            height: e.pageY - (this.state as any).current.beginY,
           },
         ],
         isMouseDown: false,
@@ -161,7 +159,6 @@ class NewDiv extends React.Component<{}, IMyState> {
           >
             {(this.state as any).isSet
               ? (this.state as any).array.map((item: any) => {
-                  console.log(item);
                   return (
                     <div
                       className="div-selected"
@@ -171,15 +168,15 @@ class NewDiv extends React.Component<{}, IMyState> {
                       onMouseUp={this.mouseUp.bind(this)}
                       style={{
                         top:
-                          (this.state as any).endY > (this.state as any).beginY
-                            ? (this.state as any).beginY
-                            : (this.state as any).endY,
+                          item.endY > item.beginY
+                            ? item.beginY
+                            : item.endY,
                         left:
-                          (this.state as any).endX > (this.state as any).beginX
-                            ? (this.state as any).beginX
-                            : (this.state as any).endX,
-                        width: (this.state as any).width,
-                        height: (this.state as any).height,
+                          item.endX > item.beginX
+                            ? item.beginX
+                            : item.endX,
+                        width: item.width,
+                        height: item.height,
                       }}
                     ></div>
                   );
