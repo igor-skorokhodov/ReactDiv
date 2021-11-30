@@ -3,36 +3,38 @@ import "../components/NewDiv.css";
 import Knight from "./Knight";
 
 interface IDiv {
-  beginX?: number;
-  beginY?: number;
-  endX?: number;
-  endY?: number;
-  width?: number;
-  height?: number;
+  beginX?: number,
+  beginY?: number,
+  endX?: number,
+  endY?: number,
+  width?: number,
+  height?: number
 }
 
-interface IMyState {
-  array: IDiv[];
-  current?: IDiv;
-  isClicked?: boolean;
-  isSet?: boolean;
-  isMouseDown?: boolean;
+interface IFieldProps {
 }
 
-class NewDiv extends React.Component<{}, IMyState> {
-  constructor(props: any) {
+interface IFieldState {
+  array: IDiv[],
+  current?: IDiv,
+  isClicked?: boolean,
+  isSet?: boolean,
+  isMouseDown?: boolean
+}
+
+export default class Field extends React.Component<IFieldProps, IFieldState> {
+  constructor(props: IFieldProps) {
     super(props);
     this.state = {
       isClicked: false,
       isSet: false,
       isMouseDown: false,
-      array: [{ beginX: 0, beginY: 0, endX: 0, endY: 0, width: 0, height: 0 }],
-      current: { beginX: 0, beginY: 0, endX: 0, endY: 0, width: 0, height: 0 },
+      array: [],
     };
   }
 
-  mouseDown(e: any) {
-    if (e.target.classList.contains("div-selected")) {
+  mouseDown(e: React.MouseEvent) {
+    if ((e.target as HTMLDivElement).classList.contains("div-selected")) {
       return;
     }
     this.setState({
@@ -82,8 +84,8 @@ class NewDiv extends React.Component<{}, IMyState> {
       current: {
         beginX: this.state.current?.beginX,
         beginY: this.state.current?.beginY,
-        endX: e.pageX, //(this.state as any).beginX,
-        endY: e.pageY, //(this.state as any).beginY,
+        endX: e.pageX, //this.state.beginX,
+        endY: e.pageY, //this.state.beginY,
         width: e.pageX - (this.state.current?.beginX as number),
         height: e.pageY - (this.state.current?.beginY as number),
       },
@@ -101,12 +103,12 @@ class NewDiv extends React.Component<{}, IMyState> {
         array: [
           ...this.state.array,
           {
-            beginX: (this.state as any).current.beginX,
-            beginY: (this.state as any).current.beginY,
+            beginX: (this.state.current as IDiv).beginX,
+            beginY: (this.state.current as IDiv).beginY,
             endX: e.pageX,
             endY: e.pageY,
-            width: Math.abs(e.pageX - (this.state as any).current.beginX),
-            height: Math.abs(e.pageY - (this.state as any).current.beginY),
+            width: Math.abs(e.pageX - this.state.current!.beginX!),
+            height: Math.abs(e.pageY - this.state.current!.beginY!),
           },
         ],
         isMouseDown: false,
@@ -116,12 +118,12 @@ class NewDiv extends React.Component<{}, IMyState> {
         array: [
           ...this.state.array,
           {
-            beginX: (this.state as any).current.beginX,
-            beginY: (this.state as any).current.beginY,
+            beginX: this.state.current!.beginX,
+            beginY: this.state.current!.beginY,
             endX: e.pageX,
             endY: e.pageY,
-            width: e.pageX - (this.state as any).current.beginX,
-            height: e.pageY - (this.state as any).current.beginY,
+            width: e.pageX - this.state.current!.beginX!,
+            height: e.pageY - this.state.current!.beginY!,
           },
         ],
         isMouseDown: false,
@@ -150,15 +152,15 @@ class NewDiv extends React.Component<{}, IMyState> {
             onMouseDown={this.mouseDown.bind(this)}
             onMouseUp={this.mouseUp.bind(this)}
             onMouseMove={
-              (this.state as any).isClicked
-                ? (e: any) => {
+              this.state.isClicked
+                ? (e: React.MouseEvent) => {
                     this.handleMouseMove(e);
                   }
                 : undefined
             }
           >
-            {(this.state as any).isSet
-              ? (this.state as any).array.map((item: any) => {
+            {this.state.isSet
+              ? this.state.array.map((item) => {
                   return (
                     <div
                       className="div-selected"
@@ -168,11 +170,11 @@ class NewDiv extends React.Component<{}, IMyState> {
                       onMouseUp={this.mouseUp.bind(this)}
                       style={{
                         top:
-                          item.endY > item.beginY
+                          (item.endY || 0) > (item.beginY || 0)
                             ? item.beginY
                             : item.endY,
                         left:
-                          item.endX > item.beginX
+                          (item.endX || 0) > (item.beginX || 0)
                             ? item.beginX
                             : item.endX,
                         width: item.width,
@@ -188,5 +190,3 @@ class NewDiv extends React.Component<{}, IMyState> {
     );
   }
 }
-
-export default NewDiv;
