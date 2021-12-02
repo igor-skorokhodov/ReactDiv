@@ -160,46 +160,45 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
           >
             {this.state.array.map((item) => {
               return (
-                <div
-                  className="div-selected"
-                 
-                  //onMouseMove={this.handleMouseMove.bind(this)}
-                  style={{
-                    top:
-                      (this.state.current!.endY || 0) > (this.state.current!.beginY || 0)
-                        ? this.state.current!.beginY
-                        : this.state.current!.endY,
-                    left:
-                      (this.state.current!.endX || 0) > (this.state.current!.beginX || 0)
-                        ? this.state.current!.beginX
-                        : this.state.current!.endX,
-                    width: this.state.current!.width,
-                    height: this.state.current!.height,
-                  }}
-                ></div>
-              );
-            })}
-            {this.state.array.map((item) => {
-              return (
-                <div
-                  className="div-selected"
-                  onMouseDown={(e: any) => {
-                    this.handleMouseMoveDiv(e);
-                  }}
-                  onMouseUp={this.mouseUp.bind(this)}
-                  style={{
-                    top:
-                      (item.endY || 0) > (item.beginY || 0)
-                        ? item.beginY
-                        : item.endY,
-                    left:
-                      (item.endX || 0) > (item.beginX || 0)
-                        ? item.beginX
-                        : item.endX,
-                    width: item.width,
-                    height: item.height,
-                  }}
-                ></div>
+                <>
+                  <div
+                    className="div-selected"
+                    onMouseDown={(e: any) => {
+                      this.handleMouseMoveDiv(e);
+                    }}
+                    onMouseUp={this.mouseUp.bind(this)}
+                    style={{
+                      top:
+                        (item.endY || 0) > (item.beginY || 0)
+                          ? item.beginY
+                          : item.endY,
+                      left:
+                        (item.endX || 0) > (item.beginX || 0)
+                          ? item.beginX
+                          : item.endX,
+                      width: item.width,
+                      height: item.height,
+                    }}
+                  ></div>
+                  <div
+                    className="div-selected"
+                    //onMouseMove={this.handleMouseMove.bind(this)}
+                    style={{
+                      top:
+                        (this.state.current!.endY || 0) >
+                        (this.state.current!.beginY || 0)
+                          ? this.state.current!.beginY
+                          : this.state.current!.endY,
+                      left:
+                        (this.state.current!.endX || 0) >
+                        (this.state.current!.beginX || 0)
+                          ? this.state.current!.beginX
+                          : this.state.current!.endX,
+                      width: this.state.current!.width,
+                      height: this.state.current!.height,
+                    }}
+                  ></div>
+                </>
               );
             })}
           </div>
