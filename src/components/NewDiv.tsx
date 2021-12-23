@@ -33,65 +33,79 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
   }
 
   mouseDown(e: React.MouseEvent) {
-    if ((e.target as HTMLDivElement).classList.contains("div-selected")) {
-      return;
-    }
-    this.setState({
-      isClicked: true,
-      isSet: true,
-      isMouseDown: true,
-      current: {
-        beginX: e.pageX,
-        beginY: e.pageY,
-        width: 0,
-        height: 0,
-      },
-    });
-  }
-
-  handleMouseMove(e: any) {
-    if (
-      e.pageX - (this.state.current!.beginX as number) < 0 ||
-      e.pageY - (this.state.current!.beginY as number) < 0
-    ) {
+    if (!(e.target as HTMLDivElement).classList.contains("div-selected")) {
+      console.log(e.pageX);
+      console.log(e.target as HTMLDivElement);
       this.setState({
+        isClicked: true,
+        isSet: true,
+        isMouseDown: true,
         current: {
-          beginX: this.state.current!.beginX,
-          beginY: this.state.current!.beginY,
-          endX: e.pageX,
-          endY: e.pageY,
-          width: Math.abs(e.pageX - (this.state.current!.beginX as number)),
-          height: Math.abs(e.pageY - (this.state.current!.beginY as number)),
+          beginX: e.pageX,
+          beginY: e.pageY,
+          width: 0,
+          height: 0,
         },
       });
     } else {
-      this.setState({
-        current: {
-          beginX: this.state.current?.beginX,
-          beginY: this.state.current?.beginY,
-          endX: e.pageX,
-          endY: e.pageY,
-          width: e.pageX - (this.state.current?.beginX as number),
-          height: e.pageY - (this.state.current?.beginY as number),
-        },
-      });
+      console.log("this is kvadrat");
+      
     }
   }
 
-  handleMouseMoveDiv(e: any) {
-    this.setState({
-      current: {
-        beginX: this.state.current?.beginX,
-        beginY: this.state.current?.beginY,
-        endX: e.pageX, //this.state.beginX,
-        endY: e.pageY, //this.state.beginY,
-        width: e.pageX - (this.state.current?.beginX as number),
-        height: e.pageY - (this.state.current?.beginY as number),
-      },
-    });
+  handleMouseMove(e: any) {
+      if ((e.target as HTMLDivElement).classList.contains("div-selected")) {
+        this.state.array.forEach((element) => {
+        console.log("popal v kvadrat");
+        console.log(e.target as HTMLDivElement);
+        this.setState({
+          array: [
+            ...this.state.array,
+            {
+              beginX: e.pageX,
+              beginY: e.pageY,
+            },
+          ],
+        });})
+      } else {
+        console.log("wrong");
+        if (
+          e.pageX - (this.state.current!.beginX as number) < 0 ||
+          e.pageY - (this.state.current!.beginY as number) < 0
+        ) {
+          console.log("this");
+          this.setState({
+            current: {
+              beginX: this.state.current!.beginX as number,
+              beginY: this.state.current!.beginY as number,
+              endX: e.pageX,
+              endY: e.pageY,
+              width: Math.abs(e.pageX - (this.state.current!.beginX as number)),
+              height: Math.abs(
+                e.pageY - (this.state.current!.beginY as number)
+              ),
+            },
+          });
+        } else {
+          console.log("that");
+          this.setState({
+            current: {
+              beginX: this.state.current?.beginX,
+              beginY: this.state.current?.beginY,
+              endX: e.pageX,
+              endY: e.pageY,
+              width: e.pageX - (this.state.current?.beginX as number),
+              height: e.pageY - (this.state.current?.beginY as number),
+            },
+          });
+        }
+      }
+    console.log(e.pageX);
   }
 
   mouseUp(e: any) {
+    if (!(e.target as HTMLDivElement).classList.contains("div-selected")) {
+      console.log('v mause up')
     this.setIsClickedFalse();
     this.setState({ isMouseDown: false });
     if (
@@ -129,6 +143,10 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
       });
     }
   }
+  else {
+    console.log("opjat kvadrat v konce")
+  }
+  }
 
   setIsClicked() {
     this.setState({ isClicked: true });
@@ -163,9 +181,6 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
                 <>
                   <div
                     className="div-selected"
-                    onMouseDown={(e: any) => {
-                      this.handleMouseMoveDiv(e);
-                    }}
                     onMouseUp={this.mouseUp.bind(this)}
                     style={{
                       top:
