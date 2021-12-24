@@ -56,17 +56,14 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
   handleMouseMove(e: any) {
       if ((e.target as HTMLDivElement).classList.contains("div-selected")) {
         this.state.array.forEach((element) => {
+          let temp = [...this.state.array];
+          temp[0] = {beginX : e.pageX, beginY: e.pageY}
+          console.log(temp[0])
         console.log("popal v kvadrat");
         console.log(e.target as HTMLDivElement);
-        this.setState({
-          array: [
-            ...this.state.array,
-            {
-              beginX: e.pageX,
-              beginY: e.pageY,
-            },
-          ],
-        });})
+        element.beginX = e.pageX;
+        element.beginY = e.pageY;
+     })
       } else {
         console.log("wrong");
         if (
@@ -88,16 +85,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
           });
         } else {
           console.log("that");
-          this.setState({
-            current: {
-              beginX: this.state.current?.beginX,
-              beginY: this.state.current?.beginY,
-              endX: e.pageX,
-              endY: e.pageY,
-              width: e.pageX - (this.state.current?.beginX as number),
-              height: e.pageY - (this.state.current?.beginY as number),
-            },
-          });
+        
         }
       }
     console.log(e.pageX);
