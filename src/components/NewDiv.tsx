@@ -1,5 +1,6 @@
 import React from "react";
 import { BlockLike, isThisTypeNode } from "typescript";
+import { runInThisContext } from "vm";
 import "../components/NewDiv.css";
 import Knight from "./Knight";
 
@@ -21,11 +22,16 @@ interface IFieldState {
   isClicked?: boolean;
   isSet?: boolean;
   isMouseDown?: boolean;
+  rows: number;
+  columns: number;
+  cellArray: IDiv[],
 }
 
 let j = 0;
 let k = 0;
 let m = 0;
+let g = 0;
+let f = 0;
 
 export default class Field extends React.Component<IFieldProps, IFieldState> {
   constructor(props: IFieldProps) {
@@ -35,12 +41,26 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
       isSet: false,
       isMouseDown: false,
       array: [],
+      rows: 0,
+      columns: 0,
+      cellArray: [],
     };
+  }
+
+  handleChangeRows(e: any) {
+    this.setState({ rows: e.target.value});
+  }
+
+  handleChangeColumns(e: any) {
+    this.setState({ columns: e.target.value});
   }
 
   mouseDown(e: React.MouseEvent) {
     k = 1;
-    if (j === 0 && !(e.target as HTMLDivElement).classList.contains("div-selected")) {
+    if (
+      j === 0 &&
+      !(e.target as HTMLDivElement).classList.contains("div-selected")
+    ) {
       this.setState({
         isClicked: true,
         isSet: true,
@@ -61,18 +81,41 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
       if (
         e.pageX <= this.state.array[i].beginX! + this.state.array[i].width! &&
         e.pageX >= this.state.array[i].beginX! - this.state.array[i].width! &&
-        e.pageY >= this.state.array[i].beginY! - this.state.array[i].height! &&
-        e.pageY <= this.state.array[i].beginY! + this.state.array[i].height!
+        e.pageY >=
+          this.state.array[i].beginY! - this.state.array[i].height! - 50 &&
+        e.pageY <=
+          this.state.array[i].beginY! + this.state.array[i].height! + 50
       ) {
-        tempArray[i] = {
-          beginX: this.state.array[i].beginX,
-          beginY: this.state.array[i].beginY,
-          width: this.state.array[i].width,
-          height: this.state.array[i].height,
-          endX: this.state.array[i].beginX! + this.state.array[i].width!,
-          endY: this.state.array[i].beginY! + this.state.array[i].height!,
-          moveFlag: true,
-        };
+        if (
+          e.pageY >= this.state.array[i].endY! - 30 &&
+          e.pageY <= this.state.array[i].endY!
+        ) {
+          g = 1;
+          f = i;
+          tempArray[i] = {
+            beginX: this.state.array[i].beginX,
+            beginY: this.state.array[i].beginY,
+            width:
+              this.state.array[i].width! +
+              (e.pageX - this.state.array[i].endX!),
+            height:
+              this.state.array[i].height! +
+              (e.pageY - this.state.array[i].endY!),
+            endX: this.state.array[i].beginX! + this.state.array[i].width!,
+            endY: this.state.array[i].beginY! + this.state.array[i].height!,
+            moveFlag: false,
+          };
+        } else {
+          tempArray[i] = {
+            beginX: this.state.array[i].beginX,
+            beginY: this.state.array[i].beginY,
+            width: this.state.array[i].width,
+            height: this.state.array[i].height,
+            endX: this.state.array[i].beginX! + this.state.array[i].width!,
+            endY: this.state.array[i].beginY! + this.state.array[i].height!,
+            moveFlag: true,
+          };
+        }
       } else {
         tempArray[i] = {
           beginX: this.state.array[i].beginX,
@@ -89,6 +132,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
   }
 
   mouseUp(e: any) {
+    g = 0;
     let tempArray = this.state.array;
     console.log(this.state.array);
     for (let i = 0; i < this.state.array.length; i++) {
@@ -131,7 +175,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
             endY: 0,
             width: 0,
             height: 0,
-          }
+          },
         });
         j = 0;
       } else {
@@ -156,7 +200,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
             endY: 0,
             width: 0,
             height: 0,
-          }
+          },
         });
         j = 0;
       }
@@ -198,24 +242,40 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
   }
 
   mouseMove(e: any) {
-      if (k === 1) {
-        this.setState({
-          current: {
-            beginX: this.state.current?.beginX,
-            beginY: this.state.current?.beginY,
+    let tempArray = this.state.array;
+    if (k === 1) {
+      this.setState({
+        current: {
+          beginX: this.state.current?.beginX,
+          beginY: this.state.current?.beginY,
+          endX: e.pageX,
+          endY: e.pageY,
+          width: Math.abs(e.pageX - this.state.current!.beginX!),
+          height: Math.abs(e.pageY - this.state.current!.beginY!),
+        },
+      });
+    }
+    if (g === 1) {
+      for (let i = 0; i < this.state.array.length; i++) {
+        if (i === f) {
+          tempArray[i] = {
+            beginX: this.state.array[i].beginX,
+            beginY: this.state.array[i].beginY,
+            width: e.pageX - this.state.array[i].beginX!,
+            height: e.pageY - this.state.array[i].beginY!,
             endX: e.pageX,
             endY: e.pageY,
-            width: Math.abs(e.pageX - this.state.current!.beginX!),
-            height: Math.abs(e.pageY - this.state.current!.beginY!),
-          },
-        });
+            moveFlag: false,
+          };
+        }
+      }
+    }
+    this.setState({ array: tempArray });
   }
-}
 
   render() {
     return (
       <>
-        <Knight />
         <div className="NewDiv">
           <header className="App-header">
             <p>Div для рисования divов</p>
@@ -266,7 +326,44 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
                 </>
               );
             })}
+
+
+{this.state.cellArray.map((item) => {
+              return (
+                <>
+                  <div
+                    className="div-selected"
+                    style={{
+                      top:
+                        (item.endY || 0) > (item.beginY || 0)
+                          ? item.beginY
+                          : item.endY,
+                      left:
+                        (item.endX || 0) > (item.beginX || 0)
+                          ? item.beginX
+                          : item.endX,
+                      width: item.width,
+                      height: item.height,
+                    }}
+                  ></div>
+                </>
+              );
+            })}
+
+
           </div>
+          <p className="text">Введите количество строк:</p>
+          <input
+            onChange={this.handleChangeRows.bind(this)}
+            value={this.state.rows}
+            className="input"
+          />
+          <p className="text">Введите количество столбцов:</p>
+          <input
+            onChange={this.handleChangeColumns.bind(this)}
+            value={this.state.columns}
+            className="input"
+          />
         </div>
       </>
     );
