@@ -1,5 +1,5 @@
 import React from "react";
-import NewDiv from "../src/components/NewDiv";
+import NewDiv from "../src/components/NewDiv2";
 import "./App.css";
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
