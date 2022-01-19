@@ -186,15 +186,6 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
             onMouseDown={(e) => this.mouseDown(e)}
             onMouseMove={(e) => this.mouseMove(e)}
           >
-            <div className="container">
-              <div className="row">
-                <div className="col s12 board">
-                  <table className="simple-board">
-                    <tbody>{rows}</tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
             {this.state.array.map((item, pos) => {
               return (
                 <div
@@ -261,6 +252,15 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
               className="input"
             />
           </div>
+          <div className="container">
+              <div className="row">
+                <div className="col s12 board">
+                  <table className="simple-board">
+                    <tbody>{rows}</tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
         </div>
       </>
     );
