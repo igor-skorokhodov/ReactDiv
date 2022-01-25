@@ -1,4 +1,3 @@
-import { access } from "fs";
 import React from "react";
 import "../components/NewDiv.css";
 
@@ -29,6 +28,7 @@ interface IFieldState {
   cellArray: IDiv[];
   pos: number;
   downActive: boolean;
+  selectedDiv: boolean;
 }
 
 let pressedMouse = 0;
@@ -56,6 +56,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
         height: 0,
       },
       downActive: false,
+      selectedDiv: false,
     };
   }
 
@@ -67,15 +68,15 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
     this.setState({ columns: e.target.value });
   }
 
-  mouseDown(e: React.MouseEvent) {
-    console.log(this.state.array);
+  mouseDown(e: React.MouseEvent) { //опускаем мышку на поле без дивов
+    console.log(this.state.selectedDiv)
     this.setState({ isClicked: true });
     if (
-      !(e.target as HTMLDivElement).classList.contains("div-selected") &&
-      !(e.target as HTMLDivElement).classList.contains("div-selected1") &&
-      !(e.target as HTMLDivElement).classList.contains("divActive")
+      this.state.selectedDiv === false
     ) {
-      this.setState({
+      console.log("srab")
+      console.log(e.target as HTMLDivElement)
+      this.setState({ //устанавливаем флаги и значение каррент по координатам
         isClicked: true,
         isSet: true,
         isMouseDown: true,
@@ -84,50 +85,19 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
           beginY: e.pageY,
         },
       });
-      pressedMouse = 1;
-    } else {
-      let tempArray = [];
-      for (let i = 0; i < this.state.array.length; i++) {
-        tempArray[i] = {
-          beginX: this.state.array[i].beginX,
-          beginY: this.state.array[i].beginY,
-          width: this.state.array[i].width,
-          height: this.state.array[i].height,
-          endX: this.state.array[i].beginX! + this.state.array[i].width!,
-          endY: this.state.array[i].beginY! + this.state.array[i].height!,
-          moveFlag: true,
-          pos: i,
-        };
-      }
-      if (this.state.arrayActive.length !== 0) {
-        tempArray.push(this.state.arrayActive[0]);
-      } else {
-        console.log("empty");
-      }
-      this.setState({
-        array: tempArray,
-        current: {
-          beginX: e.pageX,
-          beginY: e.pageY,
-          width: 0,
-          height: 0,
-          endX: 0,
-          endY: 0,
-        },
-      });
-    }
+    } 
   }
 
   mouseDownActive(e: React.MouseEvent, pos: any) {
-    this.setState({ downActive: true });
+    console.log("srabotalo")
+    this.setState({ downActive: true, selectedDiv: true });
     let tempArray = this.state.arrayActive;
     let tempArray2 = this.state.array;
     for (let i = 0; i < this.state.array.length; i++) {
       if (
-        this.state.array[i].beginX === this.state.arrayActive[0].beginX &&
+        this.state.array[i].beginX === this.state.arrayActive[0].beginX && //если кликаем по выделенному диву элемент в основном массиве скрывается
         this.state.array[i].beginY === this.state.arrayActive[0].beginY
       ) {
-        console.log('dadadadadadada')
         tempArray2[i] = {
           beginX: 0,
           beginY: 0,
@@ -138,9 +108,6 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
         };
       }
     }
-    this.setState({array: tempArray2});
-    console.log(this.state.array)
-    console.log(tempArray2)
     for (let i = 0; i < this.state.arrayActive.length; i++) {
       if (
         e.pageY >= this.state.arrayActive[i].endY! - 30 && // изменение границ дива при клике у границы
@@ -167,7 +134,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
           pos: i,
         };
       } else {
-        tempArray[i] = {
+        tempArray[i] = { //пробегаемся по всему массиву дивов
           beginX: this.state.arrayActive[i].beginX,
           beginY: this.state.arrayActive[i].beginY,
           width: this.state.arrayActive[i].width,
@@ -181,10 +148,11 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
       this.setState({ pos: pos });
     }
     this.setState({
+      array: tempArray2,
       arrayActive: tempArray,
       current: {
-        beginX: 0,
-        beginY: 0,
+        beginX: e.pageX,
+        beginY: e.pageY,
         width: 0,
         height: 0,
         endX: 0,
@@ -194,119 +162,115 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
   }
 
   mouseUp(e: any) {
-    console.log(this.state.array)
-    if (this.state.downActive === true) {
-      console.log("AGA");
-    } else {
-      this.setState({ isClicked: false, tempArrActive: [] });
-      let tempArray = this.state.array;
+    this.setState({ isClicked: false, tempArrActive: [] });
+    let tempArray = this.state.array;
+    for (let i = 0; i < this.state.array.length; i++) {
+      //отпустили мышь при перемещении закрыли флаг перемещения
+      if (this.state.array[i].moveFlag === true) {
+        tempArray[i] = {
+          beginX: this.state.array[i].beginX,
+          beginY: this.state.array[i].beginY,
+          endX: this.state.array[i].endX,
+          endY: this.state.array[i].endY,
+          width: this.state.array[i].width,
+          height: this.state.array[i].height,
+          moveFlag: false,
+          pos: i,
+        };
+      }
+    }
+    let tempArray2 = this.state.arrayActive;
+    for (let i = 0; i < this.state.arrayActive.length; i++) {
+      //отпустили мышь при перемещении закрыли флаг перемещения или изменения размеров для выделенного дива
+      if (
+        this.state.arrayActive[i].moveFlag === true ||
+        this.state.arrayActive[i].changeSize === true
+      ) {
+        tempArray2[i] = {
+          beginX: this.state.arrayActive[i].beginX,
+          beginY: this.state.arrayActive[i].beginY,
+          endX: this.state.arrayActive[i].endX,
+          endY: this.state.arrayActive[i].endY,
+          width: this.state.arrayActive[i].width,
+          height: this.state.arrayActive[i].height,
+          moveFlag: false,
+          changeSize: false,
+          pos: i,
+        };
+      }
+    }
+    this.setState({ arrayActive: tempArray2 });
+
+    if (
+      !(e.target as HTMLDivElement).classList.contains("div-selected") &&
+      !(e.target as HTMLDivElement).classList.contains("divActive")
+    ) {
       for (let i = 0; i < this.state.array.length; i++) {
-        //отпустили мышь при перемещении закрыли флаг перемещения
-        if (this.state.array[i].moveFlag === true) {
-          tempArray[i] = {
-            beginX: this.state.array[i].beginX,
-            beginY: this.state.array[i].beginY,
-            endX: this.state.array[i].endX,
-            endY: this.state.array[i].endY,
-            width: this.state.array[i].width,
-            height: this.state.array[i].height,
-            moveFlag: false,
-            pos: i,
-          };
-        }
+        tempArray[i] = {
+          beginX: this.state.array[i].beginX,
+          beginY: this.state.array[i].beginY,
+          endX: this.state.array[i].endX,
+          endY: this.state.array[i].endY,
+          width: this.state.array[i].width,
+          height: this.state.array[i].height,
+          moveFlag: false,
+          pos: i,
+          changeSize: false,
+        };
       }
-      let tempArray2 = this.state.arrayActive;
-      for (let i = 0; i < this.state.arrayActive.length; i++) {
-        //отпустили мышь при перемещении закрыли флаг перемещения или изменения размеров для выделенного дива
-        if (
-          this.state.arrayActive[i].moveFlag === true ||
-          this.state.arrayActive[i].changeSize === true
-        ) {
-          tempArray2[i] = {
-            beginX: this.state.arrayActive[i].beginX,
-            beginY: this.state.arrayActive[i].beginY,
-            endX: this.state.arrayActive[i].endX,
-            endY: this.state.arrayActive[i].endY,
-            width: this.state.arrayActive[i].width,
-            height: this.state.arrayActive[i].height,
-            moveFlag: false,
-            changeSize: false,
-            pos: i,
-          };
-        }
-      }
-      this.setState({ arrayActive: tempArray2 });
 
       if (
-        !(e.target as HTMLDivElement).classList.contains("div-selected") &&
-        !(e.target as HTMLDivElement).classList.contains("divActive")
+        e.pageX - (this.state.current?.beginX as number) < 0 ||
+        e.pageY - (this.state.current?.beginY as number) < 0
       ) {
-        for (let i = 0; i < this.state.array.length; i++) {
-          tempArray[i] = {
-            beginX: this.state.array[i].beginX,
-            beginY: this.state.array[i].beginY,
-            endX: this.state.array[i].endX,
-            endY: this.state.array[i].endY,
-            width: this.state.array[i].width,
-            height: this.state.array[i].height,
-            moveFlag: false,
-            pos: i,
-            changeSize: false,
-          };
-        }
-
-        if (
-          e.pageX - (this.state.current?.beginX as number) < 0 ||
-          e.pageY - (this.state.current?.beginY as number) < 0
-        ) {
-          this.setState({
-            array: [
-              ...this.state.array,
-              {
-                beginX: (this.state.current as IDiv).beginX,
-                beginY: (this.state.current as IDiv).beginY,
-                endX: e.pageX,
-                endY: e.pageY,
-                width: Math.abs(e.pageX - this.state.current!.beginX!),
-                height: Math.abs(e.pageY - this.state.current!.beginY!),
-                moveFlag: false,
-              },
-            ],
-            current: {
-              beginX: e.pageX,
-              beginY: e.pageY,
-              endX: 0,
-              endY: 0,
-              width: 0,
-              height: 0,
+        this.setState({
+          array: [
+            ...this.state.array,
+            {
+              beginX: (this.state.current as IDiv).beginX,
+              beginY: (this.state.current as IDiv).beginY,
+              endX: e.pageX,
+              endY: e.pageY,
+              width: Math.abs(e.pageX - this.state.current!.beginX!),
+              height: Math.abs(e.pageY - this.state.current!.beginY!),
+              moveFlag: false,
             },
-            isMouseDown: false,
-          });
-        } else {
-          this.setState({
-            array: [
-              ...this.state.array,
-              {
-                beginX: this.state.current!.beginX,
-                beginY: this.state.current!.beginY,
-                endX: e.pageX,
-                endY: e.pageY,
-                width: e.pageX - this.state.current!.beginX!,
-                height: e.pageY - this.state.current!.beginY!,
-                moveFlag: false,
-              },
-            ],
-            current: {
-              beginX: e.pageX,
-              beginY: e.pageY,
-              endX: 0,
-              endY: 0,
-              width: 0,
-              height: 0,
+          ],
+          current: {
+            beginX: e.pageX,
+            beginY: e.pageY,
+            endX: 0,
+            endY: 0,
+            width: 0,
+            height: 0,
+          },
+          isMouseDown: false,
+        });
+      } else {
+        this.setState({
+          downActive: false,
+          array: [
+            ...this.state.array,
+            {
+              beginX: this.state.current!.beginX,
+              beginY: this.state.current!.beginY,
+              endX: e.pageX,
+              endY: e.pageY,
+              width: e.pageX - this.state.current!.beginX!,
+              height: e.pageY - this.state.current!.beginY!,
+              moveFlag: false,
             },
-            isMouseDown: false,
-          });
-        }
+          ],
+          current: {
+            beginX: e.pageX,
+            beginY: e.pageY,
+            endX: 0,
+            endY: 0,
+            width: 0,
+            height: 0,
+          },
+          isMouseDown: false,
+        });
       }
     }
   }
@@ -325,6 +289,12 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
   };
 
   onDivMove(e: any) {
+    this.setState({
+      current: {
+        beginX: e.pageX,
+        beginY: e.pageY,
+      },
+    });
     let tempArray = this.state.arrayActive;
     //перемещение дива
     for (let i = 0; i < this.state.arrayActive.length; i++) {
@@ -344,9 +314,14 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
   }
 
   onDivMoveActive(e: any) {
+    this.setState({
+      current: {
+        beginX: e.pageX,
+        beginY: e.pageY,
+      },
+    });
     let tempArray = this.state.arrayActive;
     let tempArray2 = this.state.array;
-    console.log(this.state.pos);
     //перемещение дива
     for (let i = 0; i < this.state.arrayActive.length; i++) {
       if (this.state.arrayActive[i].moveFlag === true && this.state.pos === i) {
@@ -360,16 +335,21 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
           moveFlag: true,
         };
       }
-      if (this.state.pos === i) {
-        console.log("pos ", this.state.pos);
-        console.log("i ", i);
-        // tempArray2.shift();
-      }
     }
     this.setState({ arrayActive: tempArray, array: tempArray2 });
   }
 
   mouseMove(e: any) {
+    this.setState({
+      current: {
+        beginX: e.pageX,
+        beginY: e.pageY,
+        width: 0,
+        height: 0,
+        endX: 0,
+        endY: 0,
+      },
+    });
     if (this.state.isClicked === true) {
       this.setState({
         current: {
