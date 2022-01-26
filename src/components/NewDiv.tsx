@@ -2,33 +2,33 @@ import React from "react";
 import "../components/NewDiv.css";
 
 interface IDiv {
-  beginX?: number;
-  beginY?: number;
-  endX?: number;
-  endY?: number;
-  width?: number;
-  height?: number;
-  moveFlag?: boolean;
-  pos?: number;
-  changeSize?: boolean;
+  beginX?: number,
+  beginY?: number,
+  endX?: number,
+  endY?: number,
+  width?: number,
+  height?: number,
+  moveFlag?: boolean,
+  pos?: number,
+  changeSize?: boolean,
 }
 
 interface IFieldProps {}
 
 interface IFieldState {
-  tempArrActive: IDiv[];
-  arrayActive: IDiv[];
-  array: IDiv[];
-  current?: IDiv;
-  isClicked?: boolean;
-  isSet?: boolean;
-  isMouseDown?: boolean;
-  rows: number;
-  columns: number;
-  cellArray: IDiv[];
-  pos: number;
-  downActive: boolean;
-  selectedDiv: boolean;
+  tempArrActive: IDiv[],
+  arrayActive: IDiv[],
+  array: IDiv[],
+  current?: IDiv,
+  isClicked?: boolean,
+  isSet?: boolean,
+  isMouseDown?: boolean,
+  rows: number,
+  columns: number,
+  cellArray: IDiv[],
+  pos: number,
+  downActive: boolean,
+  selectedDiv: boolean,
 }
 
 let pressedMouse = 0;
@@ -68,15 +68,15 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
     this.setState({ columns: e.target.value });
   }
 
-  mouseDown(e: React.MouseEvent) { //опускаем мышку на поле без дивов
-    console.log(this.state.selectedDiv)
+  mouseDown(e: React.MouseEvent) {
+    this.setState({selectedDiv: false}) //маркер чтобы рисовался current
+    //опускаем мышку на поле без дивов
     this.setState({ isClicked: true });
-    if (
-      this.state.selectedDiv === false
-    ) {
-      console.log("srab")
-      console.log(e.target as HTMLDivElement)
-      this.setState({ //устанавливаем флаги и значение каррент по координатам
+    if (this.state.selectedDiv === false) {
+      console.log("srab");
+      console.log(e.target as HTMLDivElement);
+      this.setState({
+        //устанавливаем флаги и значение каррент по координатам
         isClicked: true,
         isSet: true,
         isMouseDown: true,
@@ -85,11 +85,10 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
           beginY: e.pageY,
         },
       });
-    } 
+    }
   }
 
-  mouseDownActive(e: React.MouseEvent, pos: any) {
-    console.log("srabotalo")
+  mouseDownActive(e: React.MouseEvent, pos: any) { //нажали на активный div
     this.setState({ downActive: true, selectedDiv: true });
     let tempArray = this.state.arrayActive;
     let tempArray2 = this.state.array;
@@ -134,7 +133,8 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
           pos: i,
         };
       } else {
-        tempArray[i] = { //пробегаемся по всему массиву дивов
+        tempArray[i] = {
+          //пробегаемся по всему массиву дивов
           beginX: this.state.arrayActive[i].beginX,
           beginY: this.state.arrayActive[i].beginY,
           width: this.state.arrayActive[i].width,
@@ -147,7 +147,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
       }
       this.setState({ pos: pos });
     }
-    this.setState({
+    this.setState({ //скрываем current
       array: tempArray2,
       arrayActive: tempArray,
       current: {
@@ -162,6 +162,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
   }
 
   mouseUp(e: any) {
+    console.log("thisActive", this.state.arrayActive);
     this.setState({ isClicked: false, tempArrActive: [] });
     let tempArray = this.state.array;
     for (let i = 0; i < this.state.array.length; i++) {
@@ -179,6 +180,26 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
         };
       }
     }
+
+    if (this.state.selectedDiv === true) {
+     // доавили в массив дивов див после перемещения активного дива
+      this.setState({
+        array: [
+          ...this.state.array,
+          {
+            beginX: this.state.arrayActive[0].beginX,
+            beginY: this.state.arrayActive[0].beginY,
+            endX: this.state.arrayActive[0].endX,
+            endY: this.state.arrayActive[0].endY,
+            width: this.state.arrayActive[0].width,
+            height: this.state.arrayActive[0].height,
+            moveFlag: false,
+          },
+        ],
+      });
+    }
+
+
     let tempArray2 = this.state.arrayActive;
     for (let i = 0; i < this.state.arrayActive.length; i++) {
       //отпустили мышь при перемещении закрыли флаг перемещения или изменения размеров для выделенного дива
@@ -202,7 +223,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
     this.setState({ arrayActive: tempArray2 });
 
     if (
-      !(e.target as HTMLDivElement).classList.contains("div-selected") &&
+      !(e.target as HTMLDivElement).classList.contains("div-selected") && //добавляем див в массив дивов
       !(e.target as HTMLDivElement).classList.contains("divActive")
     ) {
       for (let i = 0; i < this.state.array.length; i++) {
@@ -218,11 +239,11 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
           changeSize: false,
         };
       }
-
       if (
         e.pageX - (this.state.current?.beginX as number) < 0 ||
         e.pageY - (this.state.current?.beginY as number) < 0
       ) {
+        console.log('fffff')
         this.setState({
           array: [
             ...this.state.array,
@@ -247,6 +268,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
           isMouseDown: false,
         });
       } else {
+        console.log('dddddd')
         this.setState({
           downActive: false,
           array: [
@@ -273,6 +295,15 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
         });
       }
     }
+    this.setState({current: //обнулили current
+    {
+      beginX: 0,
+      beginY: 0,
+      endX: 0,
+      endY: 0,
+      width: 0,
+      height: 0,
+    }})
   }
 
   onDivDown = (e: any, position: number) => {
@@ -314,7 +345,9 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
   }
 
   onDivMoveActive(e: any) {
+    console.log(this.state.selectedDiv);
     this.setState({
+      selectedDiv: true,
       current: {
         beginX: e.pageX,
         beginY: e.pageY,
@@ -340,7 +373,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
   }
 
   mouseMove(e: any) {
-    this.setState({
+    this.setState({ //обнуление currnt дива
       current: {
         beginX: e.pageX,
         beginY: e.pageY,
@@ -350,7 +383,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
         endY: 0,
       },
     });
-    if (this.state.isClicked === true) {
+    if (this.state.isClicked === true) { //рисование currnt дива
       this.setState({
         current: {
           beginX: this.state.current?.beginX,
@@ -378,7 +411,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
       }
     }
     let tempArray = this.state.arrayActive;
-    if (
+    if ( //выделение ячеек
       pressedMouse === 1 &&
       (e.target as HTMLDivElement).classList.contains("cell")
     ) {
@@ -404,7 +437,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
       }
     }
     for (let i = 0; i < this.state.arrayActive.length; i++) {
-      //изменение размеров
+      //изменение размеров дива
       if (this.state.arrayActive[i].changeSize === true) {
         console.log(this.state.arrayActive[i]);
         tempArray[i] = {
@@ -506,7 +539,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
                 </>
               );
             })}
-
+          { this.state.selectedDiv === false ?
             <div
               className="div-selected1"
               style={{
@@ -523,7 +556,7 @@ export default class Field extends React.Component<IFieldProps, IFieldState> {
                 width: this.state.current!.width,
                 height: this.state.current!.height,
               }}
-            ></div>
+            ></div> : <></>}
           </div>
           <p className="text">Введите количество строк:</p>
           <input
